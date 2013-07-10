@@ -1,0 +1,200 @@
+# $Id$
+# Maintainer: Tobias Powalowski <tpowa@archlinux.org>
+# Maintainer: Thomas Baechler <thomas@archlinux.org>
+
+pkgbase=linux-apparmor      # Build kernel with a different name
+_curkerver=`uname -r`
+_srcname=linux-`cut -f1-2 -d. <<< $_curkerver`
+pkgver=`cut -f1 -d- <<< $_curkerver`
+pkgrel=`cut -f2 -d- <<< $_curkerver`
+arch=('i686' 'x86_64')
+url="http://www.kernel.org/"
+license=('GPL2')
+makedepends=('xmlto' 'docbook-xsl')
+options=('!strip')
+source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x/${_srcname}.tar.xz"
+        "http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x/patch-${pkgver}.xz"
+        # the main kernel config files
+        'config' 'config.x86_64'
+        # standard config files for mkinitcpio ramdisk
+        'linux.preset'
+        'change-default-console-loglevel.patch'
+        0001-UBUNTU-SAUCE-AppArmor-Add-profile-introspection-file.patch
+        0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch
+        0003-apparmor-Fix-quieting-of-audit-messages-for-network-.patch
+        0004-apparmor-Ensure-apparmor-does-not-mediate-kernel-bas.patch
+        0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch)
+
+md5sums=(
+        1c738edfc54e7c65faeb90c436104e2f # linux-3.8
+	#f11748a53d4ec0e2dcbfbb64526d6434 # patch-3.8.4
+	76ec67882ad94b8ab43c70a46befca13
+        838191b72463b4146bc981b602423311
+        0bebd8b31487488bd75fe5a1892d0db8
+        cf91b4c5d7967a861cb8fe4540536df5
+        9d3c56a4b999c8bfbd4018089a62f662
+        8f0ed59ec9b412b61feb6b88375f504e
+        cad59320b583e78e8f8c0b8eba61ffef
+        df32cf1f7d3e415dde75e5c624b791fe
+        c14fba50d8cbd9f1b11d05f26aea0f97
+        2c447c3cf9c49cadf5095d9a5f2ffb82)
+
+_kernelname=${pkgbase#linux}
+
+build() {
+  cd "${srcdir}/${_srcname}"
+
+  # add upstream patch
+  patch -p1 -i "${srcdir}/patch-${pkgver}"
+
+  # add latest fixes from stable queue, if needed
+  # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
+
+  # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
+  # remove this when a Kconfig knob is made available by upstream
+  # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
+  patch -Np1 -i "${srcdir}/change-default-console-loglevel.patch"
+
+  # AppArmor patchset
+  patch -Np1 -i "$srcdir/0001-UBUNTU-SAUCE-AppArmor-Add-profile-introspection-file.patch"
+  if [ -f $srcdir/linux-$pkgver/security/apparmor/net.c ]; then 
+    rm $srcdir/linux-$pkgver/security/apparmor/net.c 2> /dev/null
+  fi
+  if [ -f $srcdir/linux-$pkgver/security/apparmor/include/net.h ]; then
+    rm $srcdir/linux-$pkgver/security/apparmor/include/net.h 2> /dev/null
+  fi
+  patch -Np1 -i "$srcdir/0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch"
+  patch -Np1 -i "$srcdir/0003-apparmor-Fix-quieting-of-audit-messages-for-network-.patch"
+
+  # cause kernel to hangs at boot
+  #patch -Np1 -i "$srcdir/0004-apparmor-Ensure-apparmor-does-not-mediate-kernel-bas.patch"
+
+  if [ -f $srcdir/linux-$pkgver/security/apparmor/include/mount.h ]; then
+    rm -v $srcdir/linux-$pkgver/security/apparmor/include/mount.h
+  fi
+  if [ -f $srcdir/linux-$pkgver/security/apparmor/mount.c ]; then
+    rm -v $srcdir/linux-$pkgver/security/apparmor/mount.c
+  fi
+  patch -Np1 -i "$srcdir/0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch"
+
+
+  if [ "${CARCH}" = "x86_64" ]; then
+    cat "${srcdir}/config.x86_64" > ./.config
+  else
+    cat "${srcdir}/config" > ./.config
+  fi
+
+  if [ "${_kernelname}" != "" ]; then
+    sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
+    sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
+  fi
+
+  echo CONFIG_SECURITY_APPARMOR_COMPAT_24=y >> ./.config
+
+  # set extraversion to pkgrel
+  sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
+
+  # don't run depmod on 'make install'. We'll do this ourselves in packaging
+  sed -i '2iexit 0' scripts/depmod.sh
+
+  # get kernel version
+  make prepare
+
+  # load configuration
+  # Configure the kernel. Replace the line below with one of your choice.
+  #make menuconfig # CLI menu for configuration
+  #make nconfig # new CLI menu for configuration
+  #make xconfig # X-based configuration
+  #make oldconfig # using old config from previous kernel version
+  # ... or manually edit .config
+
+  # rewrite configuration
+  yes "" | make config >/dev/null
+
+  # save configuration for later reuse
+  if [ "${CARCH}" = "x86_64" ]; then
+    cat .config > "${startdir}/config.x86_64.last"
+  else
+    cat .config > "${startdir}/config.last"
+  fi
+
+  ####################
+  # stop here
+  # this is useful to configure the kernel
+  #msg "Stopping build"; return 1
+  ####################
+
+  # build!
+  make ${MAKEFLAGS} LOCALVERSION= bzImage
+}
+
+_package() {
+  pkgdesc="The ${pkgbase} kernel and modules"
+  [ "${pkgbase}" = "linux" ] && groups=('base')
+  depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7')
+  optdepends=('crda: to set the correct wireless channels of your country')
+  provides=("kernel26${_kernelname}=${pkgver}")
+  conflicts=("kernel26${_kernelname}")
+  replaces=("kernel26${_kernelname}")
+  backup=("etc/mkinitcpio.d/${pkgbase}.preset")
+  install=linux.install
+
+  cd "${srcdir}/${_srcname}"
+
+  KARCH=x86
+
+  # get kernel version
+  _kernver="$(make LOCALVERSION= kernelrelease)"
+  _basekernel=${_kernver%%-*}
+  _basekernel=${_basekernel%.*}
+
+  mkdir -p "${pkgdir}"/{lib/modules,lib/firmware,boot}
+  cp -rT /usr/lib/modules/${pkgver}-${pkgrel}-ARCH/ ${pkgdir}/lib/modules/${_kernver}
+  #make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}" modules_install
+  cp arch/$KARCH/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgbase}"
+
+  # add vmlinux
+  install -D -m644 vmlinux "${pkgdir}/usr/src/linux-${_kernver}/vmlinux"
+
+  # install fallback mkinitcpio.conf file and preset file for kernel
+  install -D -m644 "${srcdir}/linux.preset" "${pkgdir}/etc/mkinitcpio.d/${pkgbase}.preset"
+
+  # set correct depmod command for install
+  sed \
+    -e  "s/KERNEL_NAME=.*/KERNEL_NAME=${_kernelname}/" \
+    -e  "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" \
+    -i "${startdir}/linux.install"
+  sed \
+    -e "1s|'linux.*'|'${pkgbase}'|" \
+    -e "s|ALL_kver=.*|ALL_kver=\"/boot/vmlinuz-${pkgbase}\"|" \
+    -e "s|default_image=.*|default_image=\"/boot/initramfs-${pkgbase}.img\"|" \
+    -e "s|fallback_image=.*|fallback_image=\"/boot/initramfs-${pkgbase}-fallback.img\"|" \
+    -i "${pkgdir}/etc/mkinitcpio.d/${pkgbase}.preset"
+
+  # remove build and source links
+  rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
+  # remove the firmware
+  rm -rf "${pkgdir}/lib/firmware"
+  # gzip -9 all modules to save 100MB of space
+  find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
+  # make room for external modules
+  ln -sfT "../extramodules-${_basekernel}${_kernelname:--ARCH}" "${pkgdir}/lib/modules/${_kernver}/extramodules"
+  # add real version for building modules and running depmod from post_install/upgrade
+  mkdir -p "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--ARCH}"
+  echo "${_kernver}" > "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--ARCH}/version"
+
+  # Now we call depmod...
+  depmod -b "$pkgdir" -F System.map "$_kernver"
+
+  # move module tree /lib -> /usr/lib
+  mv "$pkgdir/lib" "$pkgdir/usr"
+}
+
+pkgname=("${pkgbase}")
+for _p in ${pkgname[@]}; do
+  eval "package_${_p}() {
+    _package${_p#${pkgbase}}
+  }"
+done
+
+# vim:set ts=8 sts=2 sw=2 et:

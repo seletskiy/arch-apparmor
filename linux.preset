@@ -1,0 +1,14 @@
+# mkinitcpio preset file for the 'linux-apparmor' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-apparmor"
+
+PRESETS=('default')
+
+#default_config="/etc/mkinitcpio.conf"
+default_image="/boot/initramfs-linux-apparmor.img"
+#default_options=""
+
+#fallback_config="/etc/mkinitcpio.conf"
+fallback_image="/boot/initramfs-linux-apparmor-fallback.img" 
+fallback_options="-S autodetect"
