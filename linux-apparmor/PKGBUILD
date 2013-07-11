@@ -3,7 +3,7 @@
 # Maintainer: Thomas Baechler <thomas@archlinux.org>
 
 pkgbase=linux-apparmor      # Build kernel with a different name
-_curkerver=`uname -r`
+_curkerver=`pacman -Q linux | cut -d\  -f2`
 _srcname=linux-`cut -f1-2 -d. <<< $_curkerver`
 pkgver=`cut -f1 -d- <<< $_curkerver`
 pkgrel=`cut -f2 -d- <<< $_curkerver`
