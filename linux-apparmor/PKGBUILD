@@ -10,7 +10,7 @@ pkgrel=`cut -f2 -d- <<< $_curkerver`
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl')
+makedepends=('xmlto' 'docbook-xsl' 'bc')
 options=('!strip')
 source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x/${_srcname}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x/patch-${pkgver}.xz"
