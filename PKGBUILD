@@ -26,11 +26,12 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch)
 
 md5sums=(
-        1c738edfc54e7c65faeb90c436104e2f # linux-3.8
+        4348c9b6b2eb3144d601e87c19d5d909  # linux-3.9
+        41f350c2fd6aa14414bf39f173a8e6a3  # patch-3.9.9
+        #1c738edfc54e7c65faeb90c436104e2f # linux-3.8
 	#f11748a53d4ec0e2dcbfbb64526d6434 # patch-3.8.4
-	76ec67882ad94b8ab43c70a46befca13
-        838191b72463b4146bc981b602423311
-        0bebd8b31487488bd75fe5a1892d0db8
+        61b61d66adf7e155fc4d4c9b1ede23aa  # config
+        53279d3bc5213cae51bb8f320f81fb0f  # config.x86_64
         cf91b4c5d7967a861cb8fe4540536df5
         9d3c56a4b999c8bfbd4018089a62f662
         8f0ed59ec9b412b61feb6b88375f504e
@@ -41,7 +42,7 @@ md5sums=(
 
 _kernelname=${pkgbase#linux}
 
-build() {
+prepare() {
   cd "${srcdir}/${_srcname}"
 
   # add upstream patch
@@ -77,7 +78,6 @@ build() {
   fi
   patch -Np1 -i "$srcdir/0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch"
 
-
   if [ "${CARCH}" = "x86_64" ]; then
     cat "${srcdir}/config.x86_64" > ./.config
   else
@@ -97,8 +97,14 @@ build() {
   # don't run depmod on 'make install'. We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
 
+  yes "" | make config >/dev/null
+
   # get kernel version
   make prepare
+}
+
+build() {
+  cd "${srcdir}/${_srcname}"
 
   # load configuration
   # Configure the kernel. Replace the line below with one of your choice.
@@ -109,7 +115,7 @@ build() {
   # ... or manually edit .config
 
   # rewrite configuration
-  yes "" | make config >/dev/null
+  #yes "" | make config >/dev/null
 
   # save configuration for later reuse
   if [ "${CARCH}" = "x86_64" ]; then
