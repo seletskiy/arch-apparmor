@@ -19,6 +19,8 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch'
+        'criu-no-expert.patch'
+        '3.11-haswell-intel_pstate.patch'
         0001-UBUNTU-SAUCE-AppArmor-Add-profile-introspection-file.patch
         0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch
         0003-apparmor-Fix-quieting-of-audit-messages-for-network-.patch
@@ -26,17 +28,20 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch)
 
 md5sums=(
-        4348c9b6b2eb3144d601e87c19d5d909  # linux-3.9
-        41f350c2fd6aa14414bf39f173a8e6a3  # patch-3.9.9
-	ff8c71d23fa8f635b1ae544fcc401044
-	f05fc5c6243a7fe53143db2713841444
-        cf91b4c5d7967a861cb8fe4540536df5
-        9d3c56a4b999c8bfbd4018089a62f662
-        8f0ed59ec9b412b61feb6b88375f504e
-        cad59320b583e78e8f8c0b8eba61ffef
-        df32cf1f7d3e415dde75e5c624b791fe
-        c14fba50d8cbd9f1b11d05f26aea0f97
-        2c447c3cf9c49cadf5095d9a5f2ffb82)
+    'SKIP'
+    'SKIP'
+    '77cf04eba30f625d46b5097b036ae138'
+    '98d1e9862f555e5c56e95aae1f149789'
+    'eb14dcfd80c00852ef81ded6e826826a'
+    '98beb36f9b8cf16e58de2483ea9985e3'
+    'd50c1ac47394e9aec637002ef3392bd1'
+    '1040ae6c10d4a68f89899f94a2318a17'
+    '8f0ed59ec9b412b61feb6b88375f504e'
+    'cad59320b583e78e8f8c0b8eba61ffef'
+    'df32cf1f7d3e415dde75e5c624b791fe'
+    'c14fba50d8cbd9f1b11d05f26aea0f97'
+    '2c447c3cf9c49cadf5095d9a5f2ffb82'
+)
 
 _kernelname=${pkgbase#linux}
 
@@ -53,6 +58,16 @@ prepare() {
   # remove this when a Kconfig knob is made available by upstream
   # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
   patch -Np1 -i "${srcdir}/change-default-console-loglevel.patch"
+
+  # add intel haswell support to intel_pstate
+  # https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/patch/?id=6cdcdb793791f776ea9408581b1242b636d43b37
+  # will be in 3.12
+  patch -Np1 -i "${srcdir}/3.11-haswell-intel_pstate.patch"
+ 
+  # allow criu without expert option set
+  # patch from fedora
+  patch -Np1 -i "${srcdir}/criu-no-expert.patch"
+
 
   # AppArmor patchset
   patch -Np1 -i "$srcdir/0001-UBUNTU-SAUCE-AppArmor-Add-profile-introspection-file.patch"
