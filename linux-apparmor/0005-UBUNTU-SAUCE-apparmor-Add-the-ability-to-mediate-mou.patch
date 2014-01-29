@@ -66,6 +66,7 @@ index 19daa85..63e0a4c 100644
                path.o domain.o policy.o policy_unpack.o procattr.o lsm.o \
 -              resource.o sid.o file.o net.o
 +              resource.o sid.o file.o net.o mount.o
+ apparmor-$(CONFIG_SECURITY_APPARMOR_HASH) += crypto.o
  
  clean-files := capability_names.h rlim_names.h net_names.h
  
@@ -73,7 +74,7 @@ diff --git a/security/apparmor/apparmorfs.c b/security/apparmor/apparmorfs.c
 index 114fb23..ee77ec9 100644
 --- a/security/apparmor/apparmorfs.c
 +++ b/security/apparmor/apparmorfs.c
-@@ -426,10 +426,23 @@ static struct aa_fs_entry aa_fs_entry_domain[] = {
+@@ -802,10 +802,23 @@ static struct aa_fs_entry aa_fs_entry_domain[] = {
  	{ }
  };
  
@@ -89,13 +90,15 @@ index 114fb23..ee77ec9 100644
 +};
 +
  static struct aa_fs_entry aa_fs_entry_features[] = {
- 	AA_FS_DIR("domain",			aa_fs_entry_domain),
- 	AA_FS_DIR("file",			aa_fs_entry_file),
- 	AA_FS_DIR("network",                    aa_fs_entry_network),
+	AA_FS_DIR("policy",			aa_fs_entry_policy),
+	AA_FS_DIR("domain",			aa_fs_entry_domain),
+	AA_FS_DIR("file",			aa_fs_entry_file),
+	AA_FS_DIR("network",                    aa_fs_entry_network),
 +	AA_FS_DIR("mount",                      aa_fs_entry_mount),
 +	AA_FS_DIR("namespaces",                 aa_fs_entry_namespaces),
- 	AA_FS_FILE_U64("capability",		VFS_CAP_FLAGS_MASK),
- 	AA_FS_DIR("rlimit",			aa_fs_entry_rlimit),
+	AA_FS_FILE_U64("capability",		VFS_CAP_FLAGS_MASK),
+	AA_FS_DIR("rlimit",			aa_fs_entry_rlimit),
+	AA_FS_DIR("caps",			aa_fs_entry_caps),
  	{ }
 diff --git a/security/apparmor/audit.c b/security/apparmor/audit.c
 index 3ae28db..e267963 100644
