@@ -7,7 +7,6 @@ Base support for network mediation.
 
 Signed-off-by: John Johansen <john.johansen@canonical.com>
 ---
- security/apparmor/.gitignore       |    2 +-
  security/apparmor/Makefile         |   42 +++++++++-
  security/apparmor/apparmorfs.c     |    1 +
  security/apparmor/include/audit.h  |    4 +
