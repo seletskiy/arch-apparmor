@@ -27,13 +27,18 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         '0006-genksyms-fix-typeof-handling.patch'
         '0007-x86-efi-Correct-EFI-boot-stub-use-of-code32_start.patch'
         '0010-iwlwifi-mvm-delay-enabling-smart-FIFO-until-after-be.patch'
+        '0011-kernfs-fix-removed-error-check.patch'
+        '0012-fix-saa7134.patch'
+        '0013-net-Start-with-correct-mac_len-in-skb_network_protocol.patch'
+        '0014-fix-rtl8192se.patch'
+        '0015-fix-xsdt-validation.patch'
         0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch
         0003-apparmor-Fix-quieting-of-audit-messages-for-network-.patch
         0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch)
 
-sha256sums=('61558aa490855f42b6340d1a1596be47454909629327c49a5e4e10268065dffa'
-            '1d8aa6537fc2829c50358ab3a5bc6b2691fbfe12eab6ae8160ada88484a0de27'
-            '7ffe86f455f445f6d89f3f9c8f1db249b2206a49558cb01ae4743095dbf267b8'
+sha256sums=('547518eede7c590681ad28572d0af2678032b7d5741550236ef191ae27342e3f'
+            '250e839962d852d3d62f41a818086edf0ebc0514b61daa71d94d070da2882c13'
+            '250e839962d852d3d62f41a818086edf0ebc0514b61daa71d94d070da2882c13'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182'
             '6d72e14552df59e6310f16c176806c408355951724cd5b48a47bf01591b8be02'
@@ -47,13 +52,15 @@ sha256sums=('61558aa490855f42b6340d1a1596be47454909629327c49a5e4e10268065dffa'
             'ea41743891e472116ae0ce4fdd075fc8cdca563038141a6ad6cd19ef9571abd4'
             'e202056d184c096a82f6bc33062e2a7a286d9882b62f5b9bebffbfed04b1192a'
             '3215c7dcc9798f7f8432f940c45e396deba96af1d3908d0ea82bf7448f968abf')
-
+        
+            
 _kernelname=${pkgbase#linux}
 
 prepare() {
   cd "${srcdir}/${_srcname}"
 
   # add upstream patch
+  # for 3.14.1-1 - this patch already applied
   #patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
@@ -92,6 +99,30 @@ prepare() {
   # https://git.kernel.org/cgit/linux/kernel/git/iwlwifi/iwlwifi-fixes.git/commit/?id=12f853a89e29f50b17698e17e73c328a35f1498d
   # FS#39815
   patch -p1 -i "${srcdir}/0010-iwlwifi-mvm-delay-enabling-smart-FIFO-until-after-be.patch"
+
+  # fix Xorg crash with i810 chipset due to wrong removed error check
+  # References: http://lkml.kernel.org/g/533D01BD.1010200@googlemail.com
+  patch -Np1 -i "${srcdir}/0011-kernfs-fix-removed-error-check.patch"
+
+  # fix saa7134 video
+  # https://bugs.archlinux.org/task/39904
+  # https://bugzilla.kernel.org/show_bug.cgi?id=73361
+  patch -Np1 -i "${srcdir}/0012-fix-saa7134.patch"
+
+  # fix tun/openvpn performance
+  # https://bugs.archlinux.org/task/40089
+  # https://bugzilla.kernel.org/show_bug.cgi?id=74051
+  patch -Np1 -i "${srcdir}/0013-net-Start-with-correct-mac_len-in-skb_network_protocol.patch"
+
+  # fix rtl8192se authentification
+  # https://bugs.archlinux.org/task/39858
+  # https://bugzilla.kernel.org/show_bug.cgi?id=74541
+  patch -Np1 -i "${srcdir}/0014-fix-rtl8192se.patch"
+
+  # fix xsdt validation bug
+  # https://bugs.archlinux.org/task/39811
+  # https://bugzilla.kernel.org/show_bug.cgi?id=73911
+  patch -Np1 -i "${srcdir}/0015-fix-xsdt-validation.patch"
 
   # AppArmor patchset
   if [ -f $srcdir/linux-$pkgver/security/apparmor/net.c ]; then 
@@ -138,6 +169,8 @@ prepare() {
 
 build() {
   cd "${srcdir}/${_srcname}"
+  # hardcode 
+  cp -vf /home/oz/work/linux/module.c ${srcdir}/${_srcname}/kernel/
 
   # build!
   make ${MAKEFLAGS} LOCALVERSION= bzImage
@@ -164,8 +197,7 @@ _package() {
   _basekernel=${_basekernel%.*}
 
   mkdir -p "${pkgdir}"/{lib/modules,lib/firmware,boot}
-  # Hardcoded kernel version, just for ver 3.14.0-5-ARCH
-  cp -rT /usr/lib/modules/3.14.0-5-ARCH/ ${pkgdir}/lib/modules/${_kernver}
+  cp -rT /usr/lib/modules/${pkgver}-${pkgrel}-ARCH/ ${pkgdir}/lib/modules/${_kernver}
   #make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}" modules_install
   cp arch/$KARCH/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgbase}"
 
