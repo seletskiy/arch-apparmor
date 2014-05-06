@@ -49,11 +49,16 @@ sha256sums=('547518eede7c590681ad28572d0af2678032b7d5741550236ef191ae27342e3f'
             'cf2e7a2d00787f754028e7459688c2755a406e632ce48b60952fa4ff7ed6f4b7'
             'a98bc3836bcf85774a974a1585e6b64432ba8c42363ee484d14515ccd6a88e24'
             'c0af4622f75c89fef62183e18b7d49998228d4eaa906c6accaf4aa4ff0134f85'
+            '04f44bf5c181d6dc31905937c1bdccb0f5aecaad3a579e99b302502b9cbe0f7a'
+            '79359454c9d8446eb55add2b1cdbf8332bd67dafb01fefb5b1ca090225f64d18'
+            'f2a5e22c1ba6e9b8a32a7bd4a5327ee95538aa10edcee3cd12578f8ff49bf6be'
+            'ff9df6746d7cbfe858d5b4bce932951c26414a7635cb5c26cd8d5c97df36a2a1'
+            '384dd13fd4248fd6809da8c6ae29ced55d4a5cacc33ac2ae7522093ec0fb26d4'
             'ea41743891e472116ae0ce4fdd075fc8cdca563038141a6ad6cd19ef9571abd4'
             'e202056d184c096a82f6bc33062e2a7a286d9882b62f5b9bebffbfed04b1192a'
-            '3215c7dcc9798f7f8432f940c45e396deba96af1d3908d0ea82bf7448f968abf')
-        
-            
+            '3215c7dcc9798f7f8432f940c45e396deba96af1d3908d0ea82bf7448f968abf')        
+
+
 _kernelname=${pkgbase#linux}
 
 prepare() {
