@@ -13,7 +13,7 @@ license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 options=('!strip')
 source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x/${_srcname}.tar.xz"
-        #"http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x/patch-${pkgver}.xz"
+        "http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config' 'config.x86_64'
         # standard config files for mkinitcpio ramdisk
@@ -25,18 +25,18 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         '0004-fs-Don-t-return-0-from-get_anon_bdev.patch'
         '0005-Revert-Bluetooth-Enable-autosuspend-for-Intel-Blueto.patch'
         '0006-genksyms-fix-typeof-handling.patch'
-        '0007-x86-efi-Correct-EFI-boot-stub-use-of-code32_start.patch'
         '0010-iwlwifi-mvm-delay-enabling-smart-FIFO-until-after-be.patch'
         '0011-kernfs-fix-removed-error-check.patch'
         '0012-fix-saa7134.patch'
         '0013-net-Start-with-correct-mac_len-in-skb_network_protocol.patch'
-        '0014-fix-rtl8192se.patch'
         '0015-fix-xsdt-validation.patch'
+        'disagree_module_symbol_try_force.patch'
         0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch
         0003-apparmor-Fix-quieting-of-audit-messages-for-network-.patch
         0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch)
 
-sha256sums=('547518eede7c590681ad28572d0af2678032b7d5741550236ef191ae27342e3f'
+sha256sums=('65850a8c799c695ab43aab1bc7a98f2631092b696ee07db348cfca75450ad717'
+            'af640ea64e923d525a8238832e8452381e6dc76a3bf28046411cadd67c408114'
             '250e839962d852d3d62f41a818086edf0ebc0514b61daa71d94d070da2882c13'
             '250e839962d852d3d62f41a818086edf0ebc0514b61daa71d94d070da2882c13'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
@@ -47,17 +47,15 @@ sha256sums=('547518eede7c590681ad28572d0af2678032b7d5741550236ef191ae27342e3f'
             '1e1ae0f31f722e80da083ecada1f1be57f9ddad133941820c4483b0240e494c1'
             '3fffb01cf97a5a7ab9601cb277d2468c0fb1e1cceba4225915f3ffae3a5694ec'
             'cf2e7a2d00787f754028e7459688c2755a406e632ce48b60952fa4ff7ed6f4b7'
-            'a98bc3836bcf85774a974a1585e6b64432ba8c42363ee484d14515ccd6a88e24'
             'c0af4622f75c89fef62183e18b7d49998228d4eaa906c6accaf4aa4ff0134f85'
             '04f44bf5c181d6dc31905937c1bdccb0f5aecaad3a579e99b302502b9cbe0f7a'
             '79359454c9d8446eb55add2b1cdbf8332bd67dafb01fefb5b1ca090225f64d18'
             'f2a5e22c1ba6e9b8a32a7bd4a5327ee95538aa10edcee3cd12578f8ff49bf6be'
-            'ff9df6746d7cbfe858d5b4bce932951c26414a7635cb5c26cd8d5c97df36a2a1'
             '384dd13fd4248fd6809da8c6ae29ced55d4a5cacc33ac2ae7522093ec0fb26d4'
+            '4c9a0ab9e21a9129996e164ef9fef58caea0a7c3c2e46e10e74700c668f26772'
             'ea41743891e472116ae0ce4fdd075fc8cdca563038141a6ad6cd19ef9571abd4'
             'e202056d184c096a82f6bc33062e2a7a286d9882b62f5b9bebffbfed04b1192a'
-            '3215c7dcc9798f7f8432f940c45e396deba96af1d3908d0ea82bf7448f968abf')        
-
+            '3215c7dcc9798f7f8432f940c45e396deba96af1d3908d0ea82bf7448f968abf')
 
 _kernelname=${pkgbase#linux}
 
@@ -91,20 +89,15 @@ prepare() {
   # See http://www.spinics.net/lists/kernel/msg1716461.html
   # Until a solution is found, make sure the driver leaves autosuspend alone
   patch -p1 -i "${srcdir}/0005-Revert-Bluetooth-Enable-autosuspend-for-Intel-Blueto.patch"
-        
+
   # Fix generation of symbol CRCs
   # http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=dc53324060f324e8af6867f57bf4891c13c6ef18
   patch -p1 -i "${srcdir}/0006-genksyms-fix-typeof-handling.patch"
-        
-  # Fix the use of code32_start in the EFI boot stub
-  # http://permalink.gmane.org/gmane.linux.kernel/1679881
-  # https://git.kernel.org/cgit/linux/kernel/git/mfleming/efi.git/commit/?h=urgent&id=7e8213c1f3acc064aef37813a39f13cbfe7c3ce7
-  patch -p1 -i "${srcdir}/0007-x86-efi-Correct-EFI-boot-stub-use-of-code32_start.patch"
-        
+
   # https://git.kernel.org/cgit/linux/kernel/git/iwlwifi/iwlwifi-fixes.git/commit/?id=12f853a89e29f50b17698e17e73c328a35f1498d
   # FS#39815
   patch -p1 -i "${srcdir}/0010-iwlwifi-mvm-delay-enabling-smart-FIFO-until-after-be.patch"
-
+  
   # fix Xorg crash with i810 chipset due to wrong removed error check
   # References: http://lkml.kernel.org/g/533D01BD.1010200@googlemail.com
   patch -Np1 -i "${srcdir}/0011-kernfs-fix-removed-error-check.patch"
@@ -119,15 +112,14 @@ prepare() {
   # https://bugzilla.kernel.org/show_bug.cgi?id=74051
   patch -Np1 -i "${srcdir}/0013-net-Start-with-correct-mac_len-in-skb_network_protocol.patch"
 
-  # fix rtl8192se authentification
-  # https://bugs.archlinux.org/task/39858
-  # https://bugzilla.kernel.org/show_bug.cgi?id=74541
-  patch -Np1 -i "${srcdir}/0014-fix-rtl8192se.patch"
-
   # fix xsdt validation bug
   # https://bugs.archlinux.org/task/39811
   # https://bugzilla.kernel.org/show_bug.cgi?id=73911
   patch -Np1 -i "${srcdir}/0015-fix-xsdt-validation.patch"
+
+  # hardcoded retry after disagree symbol module layout
+  patch -p1 -i "${srcdir}/disagree_module_symbol_try_force.patch"
+
 
   # AppArmor patchset
   if [ -f $srcdir/linux-$pkgver/security/apparmor/net.c ]; then 
@@ -174,9 +166,6 @@ prepare() {
 
 build() {
   cd "${srcdir}/${_srcname}"
-  # hardcode 
-  cp -vf /home/oz/work/linux/module.c ${srcdir}/${_srcname}/kernel/
-
   # build!
   make ${MAKEFLAGS} LOCALVERSION= bzImage
 }
