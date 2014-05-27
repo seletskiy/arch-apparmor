@@ -1,0 +1,25 @@
+--- a/src/lxc/cgfs.c	2014-05-27 15:08:23.611118138 +0700
++++ b/src/lxc/cgfs.c	2014-05-27 15:08:06.000000000 +0700
+@@ -2064,17 +2064,18 @@
+ 
+ 	mp->need_cpuset_init = false;
+ 
+-	/* If this is the memory cgroup, we want to enforce hierarchy.
++	/* If this is the memory cgroup, we want to enforce disable hierarchy.
+ 	 * But don't fail if for some reason we can't.
+ 	 */
++        /* 2014-05-27 Oleg Zhurko: Disable hierarchy on startup */
+ 	if (lxc_string_in_array("memory", (const char **)mp->hierarchy->subsystems)) {
+ 		char *cc_path = cgroup_to_absolute_path(mp, cgroup_path, "/memory.use_hierarchy");
+ 		if (cc_path) {
+ 			r = lxc_read_from_file(cc_path, buf, 1);
+-			if (r < 1 || buf[0] != '1') {
+-				r = lxc_write_to_file(cc_path, "1", 1, false);
++			if (r < 1 || buf[0] != '0') {
++				r = lxc_write_to_file(cc_path, "0", 1, false);
+ 				if (r < 0)
+-					SYSERROR("failed to set memory.use_hierarchy to 1; continuing");
++					SYSERROR("failed to set memory.use_hierarchy to 0; continuing");
+ 			}
+ 			free(cc_path);
+ 		}
