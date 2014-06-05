@@ -26,11 +26,13 @@ conflicts=($_pkgname)
 source=("git://github.com/lxc/lxc"
 	"lxc.tmpfiles.d"
 	"lxc.service"
-	"apparmor_profile_patch.patch")
+	"apparmor_profile_patch.patch"
+	"cgfs_disable_hierarchy.patch")
 md5sums=('SKIP'
          'c41805bdf17905f4d378c55f5b847c78'
          '32db4ef06b27f36e15ff4b67c049dfeb'
-         'bfa0bd1bdb241c41ac3f19a770e8f94d')
+         'bfa0bd1bdb241c41ac3f19a770e8f94d'
+         '6978aaa92c8203c23300a985c8020dd4')
 prepare() {
   cd "$_gitname"
   sed -i \
@@ -47,6 +49,7 @@ pkgver() {
 build() {
   cd "$_gitname"
   patch -p1 -i "${srcdir}/apparmor_profile_patch.patch"
+  patch -p1 -i "${srcdir}/cgfs_disable_hierarchy.patch"
   ./autogen.sh
   ./configure \
     --prefix=/usr \
@@ -67,7 +70,6 @@ package() {
   make DESTDIR="$pkgdir" install
   install -d -m755 "$pkgdir/var/lib/lxc"
   install -d -m755 "$pkgdir/usr/lib/lxc/rootfs/dev"
-  install -D -m644 ${srcdir}/lxc.service ${pkgdir}/usr/lib/systemd/system/lxc@.service
   install -D -m644 ${srcdir}/lxc.tmpfiles.d ${pkgdir}/usr/lib/tmpfiles.d/lxc.conf
 
   cd doc
