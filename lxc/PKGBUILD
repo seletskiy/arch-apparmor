@@ -7,7 +7,7 @@
 # Contributor: Jon Nordby <jononor@gmail.com>
 
 pkgname=lxc
-pkgver=1.0.0.196.gbfd0b14
+pkgver=1.0.0.218.g1c1c705
 epoch=1
 _pkgname=lxc
 _gitname=${_pkgname}
@@ -57,6 +57,7 @@ build() {
     --localstatedir=/var \
     --libexecdir=/usr/lib \
     --sysconfdir=/etc \
+    --libdir=/usr/lib \
     --enable-apparmor \
     --enable-seccomp \
     --enable-cgmanager \
