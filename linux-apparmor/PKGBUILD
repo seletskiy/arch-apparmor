@@ -19,23 +19,21 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
         'change-default-console-loglevel.patch'
-        '0012-fix-saa7134.patch'
+        #'0012-fix-saa7134.patch'
         'disagree_module_symbol_try_force.patch'
         0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch
         0003-apparmor-Fix-quieting-of-audit-messages-for-network-.patch
         0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch)
-sha256sums=('0b69e21737673154616745e21155bea690ee3589c609d681d869ad42d253bf2e'
-            '36590c1a522375cd1bf90bd013bf8b600e08680ac4e6c94926f4fa7c8f65328f'
-            '2402305007651320428dd3994269d83c0af5bced456ab240ce944dbea55cefc1'
-            '2402305007651320428dd3994269d83c0af5bced456ab240ce944dbea55cefc1'
+sha256sums=('fe51d779badce106679b897a35cb80725131e807a40f101fc85ab4bcd38613f9'
+            '65b54621cc10bc08e0759f1348fde871d21222e1ab20207b9ebf9464a0cbb868'
+            'bb7fa72e09ba5d209792bb639b34392db273203e4f3318863e9bfa3c3be8c21a'
+            'bb7fa72e09ba5d209792bb639b34392db273203e4f3318863e9bfa3c3be8c21a'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
             'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182'
-            '79359454c9d8446eb55add2b1cdbf8332bd67dafb01fefb5b1ca090225f64d18'
             '4c9a0ab9e21a9129996e164ef9fef58caea0a7c3c2e46e10e74700c668f26772'
             'ea41743891e472116ae0ce4fdd075fc8cdca563038141a6ad6cd19ef9571abd4'
             'e202056d184c096a82f6bc33062e2a7a286d9882b62f5b9bebffbfed04b1192a'
             '3215c7dcc9798f7f8432f940c45e396deba96af1d3908d0ea82bf7448f968abf')
-
 
 _kernelname=${pkgbase#linux}
 
@@ -58,7 +56,7 @@ prepare() {
   # fix saa7134 video
   # https://bugs.archlinux.org/task/39904
   # https://bugzilla.kernel.org/show_bug.cgi?id=73361
-  patch -Np1 -i "${srcdir}/0012-fix-saa7134.patch"
+  #patch -Np1 -i "${srcdir}/0012-fix-saa7134.patch"
 
   # hardcoded retry after disagree symbol module layout
   patch -p1 -i "${srcdir}/disagree_module_symbol_try_force.patch"
