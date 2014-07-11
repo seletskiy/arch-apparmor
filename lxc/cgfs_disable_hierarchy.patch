@@ -1,0 +1,18 @@
+--- a/src/lxc/cgfs.c	2014-05-27 15:23:23.629157956 +0700
++++ b/src/lxc/cgfs.c	2014-05-27 15:27:52.672662231 +0700
+@@ -2067,6 +2067,7 @@
+ 	/* If this is the memory cgroup, we want to enforce hierarchy.
+ 	 * But don't fail if for some reason we can't.
+ 	 */
++	/*
+ 	if (lxc_string_in_array("memory", (const char **)mp->hierarchy->subsystems)) {
+ 		char *cc_path = cgroup_to_absolute_path(mp, cgroup_path, "/memory.use_hierarchy");
+ 		if (cc_path) {
+@@ -2079,6 +2080,7 @@
+ 			free(cc_path);
+ 		}
+ 	}
++	*/
+ 
+ 	/* if this is a cpuset hierarchy, we have to set cgroup.clone_children in
+ 	 * the base cgroup, otherwise containers will start with an empty cpuset.mems

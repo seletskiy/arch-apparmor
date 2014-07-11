@@ -1,0 +1,21 @@
+--- a/kernel/module.c	2014-05-13 18:33:14.000000000 +0700
++++ b/kernel/module.c	2014-05-06 16:33:19.000000000 +0700
+@@ -1160,6 +1160,7 @@
+ 			return 1;
+ 		pr_debug("Found checksum %lX vs module %lX\n",
+ 		       maybe_relocated(*crc, crc_owner), versions[i].crc);
++	
+ 		goto bad_version;
+ 	}
+ 
+@@ -1169,7 +1170,9 @@
+ bad_version:
+ 	printk("%s: disagrees about version of symbol %s\n",
+ 	       mod->name, symname);
+-	return 0;
++
++	/* HARDCODE */
++	return try_to_force_load(mod, symname) == 0;
+ }
+ 
+ static inline int check_modstruct_version(Elf_Shdr *sechdrs,
