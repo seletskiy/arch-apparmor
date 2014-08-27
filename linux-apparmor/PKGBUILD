@@ -18,7 +18,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         'config' 'config.x86_64'
         # standard config files for mkinitcpio ramdisk
         'linux.preset'
-        'change-default-console-loglevel.patch'
+        #'change-default-console-loglevel.patch'
         #'0012-fix-saa7134.patch'
         'disagree_module_symbol_try_force.patch'
         0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch
@@ -29,7 +29,7 @@ sha256sums=('be37dda8ea090525661d64e5c7fc8580f313b7f9ba8592e32120f1332bc57d71'
             '450f28c1ba5512d2ad40dd24831eb3b902440585456996632438932241816748'
             '450f28c1ba5512d2ad40dd24831eb3b902440585456996632438932241816748'
             'f0d90e756f14533ee67afda280500511a62465b4f76adcc5effa95a40045179c'
-            'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182'
+            #'faced4eb4c47c4eb1a9ee8a5bf8a7c4b49d6b4d78efbe426e410730e6267d182'
             '4c9a0ab9e21a9129996e164ef9fef58caea0a7c3c2e46e10e74700c668f26772'
             'ea41743891e472116ae0ce4fdd075fc8cdca563038141a6ad6cd19ef9571abd4'
             'e202056d184c096a82f6bc33062e2a7a286d9882b62f5b9bebffbfed04b1192a'
@@ -50,7 +50,7 @@ prepare() {
   # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
   # remove this when a Kconfig knob is made available by upstream
   # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
-  patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
+  #patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
 
 
   # fix saa7134 video
