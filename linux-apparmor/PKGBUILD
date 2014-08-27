@@ -136,8 +136,9 @@ _package() {
   #cp -rT /usr/lib/modules/${pkgver}-${pkgrel}-ARCH/ ${pkgdir}/lib/modules/${_kernver}
 
   # copy extra modules
-  mkdir -p ${pkgdir}/lib/modules/${_kernver}/extra
-  cp -rT /usr/lib/modules/${pkgver}-${pkgrel}-ARCH/extra/ ${pkgdir}/lib/modules/${_kernver}/extra
+  #mkdir -p ${pkgdir}/lib/modules/${_kernver}/extra
+  #cp -rT /usr/lib/modules/${pkgver}-${pkgrel}-ARCH/extra/ ${pkgdir}/lib/modules/${_kernver}/extra
+  ln -s /usr/lib/modules/${pkgver}-${pkgrel}-ARCH/extra/ ${pkgdir}/lib/modules/${_kernver}/extra
 
   make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}" modules_install
   cp arch/$KARCH/boot/bzImage "${pkgdir}/boot/vmlinuz-${pkgbase}"
