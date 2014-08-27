@@ -24,7 +24,7 @@ source=("http://www.kernel.org/pub/linux/kernel/v`cut -f1 -d. <<< $_curkerver`.x
         0002-UBUNTU-SAUCE-AppArmor-basic-networking-rules.patch
         0003-apparmor-Fix-quieting-of-audit-messages-for-network-.patch
         0005-UBUNTU-SAUCE-apparmor-Add-the-ability-to-mediate-mou.patch)
-sha256sums=('4813ad7927a7d92e5339a873ab16201b242b2748934f12cb5df9ba2cfe1d77a0'
+sha256sums=('be37dda8ea090525661d64e5c7fc8580f313b7f9ba8592e32120f1332bc57d71'
             'd2bf33289acf5c05b57aaca1fd8bb1935ac280c5c4090874e84806d35e17012e'
             '450f28c1ba5512d2ad40dd24831eb3b902440585456996632438932241816748'
             '450f28c1ba5512d2ad40dd24831eb3b902440585456996632438932241816748'
