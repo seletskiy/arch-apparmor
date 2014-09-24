@@ -6,7 +6,7 @@ AppArmor Arch Linux packages that are works
 This packages provides:
 
 * linux-apparmor enabled kernel (with modules).
-  **Latest supported version is: 3.16.1**
+  **Latest supported version is: 3.16.3**
 
 * lxc with apparmor support enabled.
   lxc package contains apparmor profile for creating secure lxc-containers:
