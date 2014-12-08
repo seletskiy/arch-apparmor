@@ -3,9 +3,9 @@ Description=%i LXC
 After=network.target
 
 [Service]
-Type=forking
-ExecStart=/usr/bin/lxc-start -d -n %i
-ExecStop=/usr/bin/lxc-stop -n %i
+Type=simple
+ExecStart=/usr/bin/lxc-start -n %i
+ExecStop=/usr/bin/lxc-stop -k -n %i
 
 [Install]
 WantedBy=multi-user.target

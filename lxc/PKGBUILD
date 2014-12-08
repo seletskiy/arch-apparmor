@@ -7,7 +7,7 @@
 # Contributor: Jon Nordby <jononor@gmail.com>
 
 pkgname=lxc
-pkgver=1.0.0.218.g1c1c705
+pkgver=1.0.6.61.ga44cafd
 epoch=1
 _pkgname=lxc
 _gitname=${_pkgname}
@@ -23,15 +23,15 @@ options=('emptydirs')
 backup=('etc/lxc/default.conf')
 provides=($_pkgname)
 conflicts=($_pkgname)
-source=("git://github.com/lxc/lxc"
+source=("git://github.com/lxc/lxc#branch=stable-1.0"
 	"lxc.tmpfiles.d"
 	"lxc.service"
 	"apparmor_profile_patch.patch"
 	"cgfs_disable_hierarchy.patch")
 md5sums=('SKIP'
          'c41805bdf17905f4d378c55f5b847c78'
-         '32db4ef06b27f36e15ff4b67c049dfeb'
-         'bfa0bd1bdb241c41ac3f19a770e8f94d'
+         '932f583e52002c0e84defa2e83885ded'
+         'd068b63986d5dd46f753ddada607fb51'
          '6978aaa92c8203c23300a985c8020dd4')
 prepare() {
   cd "$_gitname"
@@ -41,7 +41,7 @@ prepare() {
 }
 
 pkgver() {
-  cd "$_gitname"
+  cd "${srcdir}/$_gitname"
 #  git --no-pager describe --tags | sed 's:-:.:g'
   git --no-pager describe --tags | sed 's:^lxc-::' | sed 's:-:.:g'
 }

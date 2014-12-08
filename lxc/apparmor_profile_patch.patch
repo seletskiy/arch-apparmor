@@ -1,38 +1,6 @@
---- a/config/apparmor/abstractions/container-base	2014-05-26 15:40:45.000000000 +0700
-+++ b/config/apparmor/abstractions/container-base	2014-05-26 15:00:52.000000000 +0700
-@@ -5,9 +5,9 @@
- 
-   # The following 3 entries are only supported by recent apparmor versions.
-   # Comment them if the apparmor parser doesn't recognize them.
--  dbus,
--  signal,
--  ptrace,
-+  #dbus,
-+  #signal,
-+  #ptrace,
- 
-   # ignore DENIED message on / remount
-   deny mount options=(ro, remount) -> /,
-
---- a/config/apparmor/abstractions/start-container	2014-05-26 15:40:45.000000000 +0700
-+++ b/config/apparmor/abstractions/start-container	2014-05-26 15:00:52.000000000 +0700
-@@ -4,9 +4,9 @@
- 
-   # The following 3 entries are only supported by recent apparmor versions.
-   # Comment them if the apparmor parser doesn't recognize them.
--  dbus,
--  signal,
--  ptrace,
-+  #dbus,
-+  #signal,
-+  #ptrace,
- 
-   # currently blocked by apparmor bug
-   mount -> /usr/lib/*/lxc/{**,},
-
 --- a/config/apparmor/profiles/lxc-default	2014-05-26 15:40:45.000000000 +0700
 +++ b/config/apparmor/profiles/lxc-default	2014-05-26 15:34:25.000000000 +0700
-@@ -1,11 +1,27 @@
+@@ -1,11 +1,28 @@
  # Do not load this file.  Rather, load /etc/apparmor.d/lxc-containers, which
  # will source all profiles under /etc/apparmor.d/lxc
  
@@ -47,6 +15,7 @@
 +  
 +  # recursive mounts (with -R flag)
 +  mount options=(rw, rbind),
++  mount options=(rw, bind),
 +  
 +  # cgroup mounting under container
 +  mount fstype=cgroup -> /sys/fs/cgroup/{**,},
