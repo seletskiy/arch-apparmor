@@ -60,7 +60,7 @@ prepare() {
   rm -rf apparmor.d/bin.*
   rm -rf apparmor.d/sbin.*
   rm -rf apparmor.d/usr.*
-  sed -e "61d" -i Makefile
+  sed -re '/install -m 644 \$\{EXTRAS_SOURCE\}\/\* \$\{EXTRAS_DEST\}/d' -i Makefile
 
 }
 
