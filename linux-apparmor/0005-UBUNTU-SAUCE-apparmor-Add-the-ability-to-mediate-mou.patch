@@ -222,27 +222,27 @@ index 0000000..bc17a53
 +
 +#define AA_MS_IGNORE_MASK (MS_KERNMOUNT | MS_NOSEC | MS_ACTIVE | MS_BORN)
 +
-+int aa_remount(struct aa_profile *profile, struct path *path,
++int aa_remount(struct aa_profile *profile, const struct path *path,
 +	       unsigned long flags, void *data);
 +
-+int aa_bind_mount(struct aa_profile *profile, struct path *path,
++int aa_bind_mount(struct aa_profile *profile, const struct path *path,
 +		  const char *old_name, unsigned long flags);
 +
 +
-+int aa_mount_change_type(struct aa_profile *profile, struct path *path,
++int aa_mount_change_type(struct aa_profile *profile, const struct path *path,
 +			 unsigned long flags);
 +
-+int aa_move_mount(struct aa_profile *profile, struct path *path,
++int aa_move_mount(struct aa_profile *profile, const struct path *path,
 +		  const char *old_name);
 +
 +int aa_new_mount(struct aa_profile *profile, const char *dev_name,
-+		 struct path *path, const char *type, unsigned long flags,
++		 const struct path *path, const char *type, unsigned long flags,
 +		 void *data);
 +
 +int aa_umount(struct aa_profile *profile, struct vfsmount *mnt, int flags);
 +
-+int aa_pivotroot(struct aa_profile *profile, struct path *old_path,
-+		  struct path *new_path);
++int aa_pivotroot(struct aa_profile *profile, const struct path *old_path,
++		  const struct path *new_path);
 +
 +#endif /* __AA_MOUNT_H */
 diff --git a/security/apparmor/lsm.c b/security/apparmor/lsm.c
@@ -261,7 +261,7 @@ index a172d01..5da8af9 100644
  			   !(vma->vm_flags & VM_SHARED) ? MAP_PRIVATE : 0);
  }
  
-+static int apparmor_sb_mount(const char *dev_name, struct path *path, const char *type,
++static int apparmor_sb_mount(const char *dev_name, const struct path *path, const char *type,
 +                unsigned long flags, void *data)
 +{
 +   struct aa_profile *profile;
@@ -303,7 +303,7 @@ index a172d01..5da8af9 100644
 +   return error;
 +}
 +
-+static int apparmor_sb_pivotroot(struct path *old_path, struct path *new_path)
++static int apparmor_sb_pivotroot(const struct path *old_path, const struct path *new_path)
 +{
 +   struct aa_profile *profile;
 +   int error = 0;
@@ -668,13 +668,13 @@ index 0000000..478aa4d
 +	return 0;
 +}
 +
-+static int path_flags(struct aa_profile *profile, struct path *path)
++static int path_flags(struct aa_profile *profile, const struct path *path)
 +{
 +	return profile->path_flags |
 +		S_ISDIR(path->dentry->d_inode->i_mode) ? PATH_IS_DIR : 0;
 +}
 +
-+int aa_remount(struct aa_profile *profile, struct path *path,
++int aa_remount(struct aa_profile *profile, const struct path *path,
 +	       unsigned long flags, void *data)
 +{
 +	struct file_perms perms = { };
@@ -701,7 +701,7 @@ index 0000000..478aa4d
 +	return error;
 +}
 +
-+int aa_bind_mount(struct aa_profile *profile, struct path *path,
++int aa_bind_mount(struct aa_profile *profile, const struct path *path,
 +		  const char *dev_name, unsigned long flags)
 +{
 +	struct file_perms perms = { };
@@ -743,7 +743,7 @@ index 0000000..478aa4d
 +	return error;
 +}
 +
-+int aa_mount_change_type(struct aa_profile *profile, struct path *path,
++int aa_mount_change_type(struct aa_profile *profile, const struct path *path,
 +			 unsigned long flags)
 +{
 +	struct file_perms perms = { };
@@ -772,7 +772,7 @@ index 0000000..478aa4d
 +	return error;
 +}
 +
-+int aa_move_mount(struct aa_profile *profile, struct path *path,
++int aa_move_mount(struct aa_profile *profile, const struct path *path,
 +		  const char *orig_name)
 +{
 +	struct file_perms perms = { };
@@ -813,7 +813,7 @@ index 0000000..478aa4d
 +}
 +
 +int aa_new_mount(struct aa_profile *profile, const char *orig_dev_name,
-+		 struct path *path, const char *type, unsigned long flags,
++		 const struct path *path, const char *type, unsigned long flags,
 +		 void *data)
 +{
 +	struct file_perms perms = { };
@@ -906,8 +906,8 @@ index 0000000..478aa4d
 +	return error;
 +}
 +
-+int aa_pivotroot(struct aa_profile *profile, struct path *old_path,
-+		  struct path *new_path)
++int aa_pivotroot(struct aa_profile *profile, const struct path *old_path,
++		  const struct path *new_path)
 +{
 +	struct file_perms perms = { };
 +	struct aa_profile *target = NULL;
